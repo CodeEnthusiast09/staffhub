@@ -1,0 +1,91 @@
+### GET ENV VARIABLES
+
+GET http://localhost:3000/auth/env
+
+
+### Signup User
+
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "firstName": "Houti",
+    "lastName": "Yaman",
+    "email": "yaminahouti@taptoplab.com",
+    "password": "123456"
+}
+
+### Login User
+
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "yaminahouti@taptoplab.com",
+    "password": "123456"
+}
+
+### Send Email
+
+POST http://localhost:3000/email/send-email
+Content-Type: application/json
+
+{
+  "recipients": ["taiwooa.19@student.funaab.edu.ng"],
+  "subject": "Test Email",
+  "html": "This is a test email sent from the Nestjs application. <br> It is sent using the <a href=\"https://nodemailer.com/about/\">Nodemailer</a> package.",
+  "text": "This is a test email sent from the Nestjs application. It is sent using the Nodemailer package."
+}
+
+
+### Verify Token
+
+POST http://localhost:3000/auth/verify-email
+Content-Type: application/json
+
+{
+ "token": "879af8164e13ff9c8ece63bb900e1c64ef7c10bf83799d72b6db6bb3b76aeb53"
+}
+
+
+### RESET PASSWORD
+
+POST http://localhost:3000/auth/reset-password
+Content-Type: application/json
+
+{
+ "email": "yaminahouti@taptoplab.com"
+}
+
+### Verify OTP
+
+POST http://localhost:3000/auth/verify-login-otp
+Content-Type: application/json
+
+{
+ "tempToken": "369f41cb-383b-4505-8b71-616bcce39c0a",
+ "otp": "983959",
+ "type": "otp"
+}
+
+### Verify OTP
+
+POST http://localhost:3000/auth/verify-reset-password-otp
+Content-Type: application/json
+
+{
+ "tempToken": "24ff7268-06c8-4801-aa64-fff20ac7d306",
+ "otp": "262559",
+ "type": "reset_password"
+}
+
+### Set New Password
+
+POST http://localhost:3000/auth/set-new-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NThiYTk3Yy00M2FmLTQyNDUtOWY0ZS0yOGUwMThlNTA5ZTIiLCJlbWFpbCI6InlhbWluYWhvdXRpQHRhcHRvcGxhYi5jb20iLCJpYXQiOjE3NTA3NzE2MTksImV4cCI6MTc1MDc3NTIxOX0.AN4rSQTKVMSFJnliuxaBha-aecfy_W-wMAR0-e5zwuY
+
+{
+  "newPassword": "mypassword123"
+}
+
