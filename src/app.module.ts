@@ -7,7 +7,7 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { validate } from 'env.validation';
+import { validate } from './config/env.validation';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmAsyncConfig } from '../db/data-source';
 import { EmailController } from './email/email.controller';
@@ -37,6 +37,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggingMiddleware)
-      .forRoutes({ path: 'auth/*', method: RequestMethod.POST });
+      .forRoutes({ path: 'auth/:path', method: RequestMethod.POST });
   }
 }

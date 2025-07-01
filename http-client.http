@@ -7,12 +7,13 @@ GET http://localhost:3000/auth/env
 
 POST http://localhost:3000/auth/register
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjYsImVtYWlsIjoibmF1bW92YWthdHJpbmthQGJlbW9uZS5jb20iLCJyb2xlIjoiSFIiLCJpYXQiOjE3NTEwMTIzMjcsImV4cCI6MTc1MTAxNTkyN30.YTBcC4Pfg615YDXAGsXazgnFJa-btFbOTp-juyQFzPs
 
 {
-    "firstName": "Houti",
-    "lastName": "Yaman",
-    "email": "yaminahouti@taptoplab.com",
-    "password": "123456"
+    "firstName": "Khadijah",
+    "lastName": "Smith",
+    "email": "kadijahsmith28@casinolotte.com",
+    "role": "WORKER"
 }
 
 ### Login User
@@ -21,9 +22,12 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "yaminahouti@taptoplab.com",
-    "password": "123456"
+    "email": "naumovakatrinka@bemone.com",
+    "password": "mypassword123"
 }
+
+ # "password": "mypassword123"
+ # "password": "StrngPwd_123"
 
 ### Send Email
 
@@ -38,16 +42,6 @@ Content-Type: application/json
 }
 
 
-### Verify Token
-
-POST http://localhost:3000/auth/verify-email
-Content-Type: application/json
-
-{
- "token": "879af8164e13ff9c8ece63bb900e1c64ef7c10bf83799d72b6db6bb3b76aeb53"
-}
-
-
 ### RESET PASSWORD
 
 POST http://localhost:3000/auth/reset-password
@@ -57,35 +51,12 @@ Content-Type: application/json
  "email": "yaminahouti@taptoplab.com"
 }
 
-### Verify OTP
+### Activate Account
 
-POST http://localhost:3000/auth/verify-login-otp
+POST http://localhost:3000/auth/activate
 Content-Type: application/json
 
 {
- "tempToken": "369f41cb-383b-4505-8b71-616bcce39c0a",
- "otp": "983959",
- "type": "otp"
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImthZGlqYWhzbWl0aDI4QGNhc2lub2xvdHRlLmNvbSIsInR5cGUiOiJhY3RpdmF0aW9uIiwiaWF0IjoxNzUxMDEyMzgxLCJleHAiOjE3NTEwMTU5ODF9.kMnm7p_PxShsbXal_X3r8qOhcxxaduMM9HyIuoLSpD8",
+  "password": "mypassword123"
 }
-
-### Verify OTP
-
-POST http://localhost:3000/auth/verify-reset-password-otp
-Content-Type: application/json
-
-{
- "tempToken": "24ff7268-06c8-4801-aa64-fff20ac7d306",
- "otp": "262559",
- "type": "reset_password"
-}
-
-### Set New Password
-
-POST http://localhost:3000/auth/set-new-password
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NThiYTk3Yy00M2FmLTQyNDUtOWY0ZS0yOGUwMThlNTA5ZTIiLCJlbWFpbCI6InlhbWluYWhvdXRpQHRhcHRvcGxhYi5jb20iLCJpYXQiOjE3NTA3NzE2MTksImV4cCI6MTc1MDc3NTIxOX0.AN4rSQTKVMSFJnliuxaBha-aecfy_W-wMAR0-e5zwuY
-
-{
-  "newPassword": "mypassword123"
-}
-

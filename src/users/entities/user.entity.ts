@@ -5,12 +5,16 @@ import {
   CreateDateColumn,
   ManyToOne,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
-import { Role } from 'src/common/enums/role.enum';
-import { UserStatus } from 'src/common/enums/user-status.enum';
+import { Roles } from '../../common/enums/role.enum';
+import { Role } from 'src/entities/roles.entity';
+import { UserStatus } from '../../common/enums/user-status.enum';
 import { Exclude } from 'class-transformer';
+import { Permissions } from 'src/common/enums/permissions.enum';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -28,8 +32,8 @@ export class User {
   @Exclude()
   password: string;
 
-  @Column({ type: 'enum', enum: Role })
-  role: Role;
+  // @Column({ type: 'enum', enum: Role })
+  // role: Roles;
 
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
   status: UserStatus;
@@ -38,16 +42,39 @@ export class User {
   @Exclude()
   activationToken: string | null;
 
+  @Column({ nullable: true })
+  refreshToken?: string;
+
   @Column({ type: 'timestamp', nullable: true })
   @Exclude()
   activationTokenExpires: Date | null;
 
-  @UpdateDateColumn()
+  @CreateDateColumn()
   createdAt: Date;
 
   @ManyToOne(() => User, { nullable: true })
   createdBy: User;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToMany(() => Role, (role) => role.users, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
+  })
+  roles: Role[];
+
+  // Computed property to get all permissions from roles
+  get permissions(): Permissions[] {
+    if (!this.roles) return [];
+
+    return this.roles.reduce((allPermissions, role) => {
+      const rolePermissions = role.permissions?.map((p) => p.name) || [];
+      return [...allPermissions, ...rolePermissions];
+    }, [] as Permissions[]);
+  }
 }

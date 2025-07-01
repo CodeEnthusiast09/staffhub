@@ -10,11 +10,11 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role } from 'src/common/enums/role.enum';
+import { Roles } from '../common/enums/role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { ActivateAccountDto } from './dto/activate-account.dto';
-import { UserStatus } from 'src/common/enums/user-status.enum';
-import { EmailService } from 'src/email/email.service';
+import { UserStatus } from '../common/enums/user-status.enum';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class UsersService {
@@ -27,13 +27,20 @@ export class UsersService {
 
   async create(dto: CreateUserDto, createdBy: User): Promise<User> {
     const existing = await this.findByEmail(dto.email);
+
     if (existing) throw new BadRequestException('Email already exists');
 
-    if (![Role.MD, Role.HR].includes(createdBy.role)) {
+    const hasPermissionToCreate = createdBy.roles.some((role) =>
+      [Roles.MD, Roles.HR].includes(role.name),
+    );
+
+    if (!hasPermissionToCreate) {
       throw new ForbiddenException('Only MD or HR can create workers');
     }
 
-    const { activationToken, expiresAt } = this.generateToken(dto as User);
+    const { activationToken, expiresAt } = this.generateToken({
+      email: dto.email,
+    });
 
     const user = this.userRepo.create({
       ...dto,
@@ -51,7 +58,7 @@ export class UsersService {
     return savedUser;
   }
 
-  private generateToken(user: User): {
+  private generateToken(user: { email: string }): {
     activationToken: string;
     expiresAt: Date;
   } {
@@ -59,22 +66,17 @@ export class UsersService {
     expiresAt.setHours(expiresAt.getHours() + 24);
 
     const payload = {
-      sub: user.id,
       email: user.email,
       type: 'activation',
-      exp: Math.floor(expiresAt.getTime() / 1000),
     };
 
     const activationToken = this.jwtService.sign(payload);
     return { activationToken, expiresAt };
   }
 
-  async activateAccount({
-    token,
-    password,
-  }: ActivateAccountDto): Promise<User> {
+  async activateAccount(dto: ActivateAccountDto): Promise<User> {
     try {
-      const decoded = this.jwtService.verify(token, {
+      const decoded = this.jwtService.verify(dto.token, {
         ignoreExpiration: false,
       });
     } catch (err) {
@@ -82,7 +84,7 @@ export class UsersService {
     }
 
     const user = await this.userRepo.findOne({
-      where: { activationToken: token },
+      where: { activationToken: dto.token },
     });
 
     if (!user) throw new BadRequestException('Invalid activation token');
@@ -91,7 +93,7 @@ export class UsersService {
       throw new BadRequestException('Account is already active');
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(dto.password, 10);
 
     user.password = hashed;
     user.status = UserStatus.ACTIVE;
@@ -103,12 +105,19 @@ export class UsersService {
     return user;
   }
 
+  async updateUserRefreshToken(user: User, hashedToken: string): Promise<void> {
+    await this.userRepo.update(user?.id, { refreshToken: hashedToken });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepo.findOne({ where: { email } });
   }
 
   async findById(id: number): Promise<User> {
-    const user = await this.userRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: ['roles', 'roles.permissions'],
+    });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -128,8 +137,14 @@ export class UsersService {
       );
     }
 
-    if (dto.role && !this.canAssignRole(currentUser, dto.role)) {
-      throw new ForbiddenException('You cannot assign this role');
+    if (dto.role) {
+      const rolesToAssign = Array.isArray(dto.role) ? dto.role : [dto.role];
+      const canAssignAll = rolesToAssign.every((role) =>
+        this.canAssignRole(currentUser, role),
+      );
+      if (!canAssignAll) {
+        throw new ForbiddenException('You cannot assign this role');
+      }
     }
 
     if (dto.email && dto.email !== userToUpdate.email) {
@@ -162,13 +177,16 @@ export class UsersService {
   }
 
   private canModifyUser(currentUser: User, targetUser: User): boolean {
+    const currentRoles = currentUser.roles.map((role) => role.name);
+    const targetRoles = targetUser.roles.map((role) => role.name);
+
     // MD can modify anyone
-    if (currentUser.role === Role.MD) {
+    if (currentRoles.includes(Roles.MD)) {
       return true;
     }
 
     // HR can modify non-MD users
-    if (currentUser.role === Role.HR && targetUser.role !== Role.MD) {
+    if (currentRoles.includes(Roles.HR) && !targetRoles.includes(Roles.MD)) {
       return true;
     }
 
@@ -180,13 +198,15 @@ export class UsersService {
     return false;
   }
 
-  private canAssignRole(currentUser: User, roleToAssign: Role): boolean {
+  private canAssignRole(currentUser: User, roleToAssign: Roles): boolean {
+    const currentRoles = currentUser.roles.map((role) => role.name);
+
     // Only MD can assign MD role
-    if (roleToAssign === Role.MD) {
-      return currentUser.role === Role.MD;
+    if (roleToAssign === Roles.MD) {
+      return currentRoles.includes(Roles.MD);
     }
 
     // MD and HR can assign other roles
-    return [Role.MD, Role.HR].includes(currentUser.role);
+    return currentRoles.some((role) => [Roles.MD, Roles.HR].includes(role));
   }
 }
