@@ -1,15 +1,13 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
-  Request,
   ClassSerializerInterceptor,
   UseInterceptors,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtAuthGuard } from './guards/jwt.guard';
@@ -50,7 +48,7 @@ export class AuthController {
     return result;
   }
 
-  @Patch(':id')
+  @Put('update/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @HasRoles(Roles.MD, Roles.HR)
   async updateUser(
@@ -66,7 +64,7 @@ export class AuthController {
     return this.authService.logout();
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @HasRoles(Roles.MD, Roles.HR)
   async removeUser(@Param('id') id: string, @CurrentUser() user: User) {

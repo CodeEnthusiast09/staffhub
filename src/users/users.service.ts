@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,17 +15,22 @@ import { JwtService } from '@nestjs/jwt';
 import { ActivateAccountDto } from './dto/activate-account.dto';
 import { UserStatus } from '../common/enums/user-status.enum';
 import { EmailService } from '../email/email.service';
+import { Role } from 'src/entities/roles.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(Role)
+    private readonly roleRepo: Repository<Role>,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
 
   async create(dto: CreateUserDto, createdBy: User): Promise<User> {
+    // console.log('creator id:', createdBy.id, 'role:', createdBy.roles);
+
     const existing = await this.findByEmail(dto.email);
 
     if (existing) throw new BadRequestException('Email already exists');
@@ -42,6 +47,16 @@ export class UsersService {
       email: dto.email,
     });
 
+    // Fetch roles based on provided dto.role
+    const rolesToAssign = Array.isArray(dto.role) ? dto.role : [dto.role];
+    const roleEntities = await this.roleRepo.findBy({
+      name: In(rolesToAssign),
+    });
+
+    if (roleEntities.length === 0) {
+      throw new BadRequestException('Invalid role(s) provided');
+    }
+
     const user = this.userRepo.create({
       ...dto,
       status: UserStatus.PENDING,
@@ -49,6 +64,7 @@ export class UsersService {
       activationToken,
       activationTokenExpires: expiresAt,
       createdBy,
+      roles: roleEntities,
     });
 
     const savedUser = await this.userRepo.save(user);
@@ -142,8 +158,33 @@ export class UsersService {
       const canAssignAll = rolesToAssign.every((role) =>
         this.canAssignRole(currentUser, role),
       );
+
       if (!canAssignAll) {
         throw new ForbiddenException('You cannot assign this role');
+      }
+
+      if (dto.role) {
+        const rolesToAssign = Array.isArray(dto.role) ? dto.role : [dto.role];
+
+        const canAssignAll = rolesToAssign.every((role) =>
+          this.canAssignRole(currentUser, role),
+        );
+        if (!canAssignAll) {
+          throw new ForbiddenException(
+            'You cannot assign one or more of the roles',
+          );
+        }
+
+        // 🔧 Fetch matching Role entities
+        const roleEntities = await this.roleRepo.findBy({
+          name: In(rolesToAssign.map((r) => r.toUpperCase())),
+        });
+
+        if (roleEntities.length !== rolesToAssign.length) {
+          throw new BadRequestException('One or more roles are invalid');
+        }
+
+        userToUpdate.roles = roleEntities;
       }
     }
 

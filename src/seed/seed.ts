@@ -7,8 +7,8 @@ import { Roles } from '../common/enums/role.enum';
 import { UserStatus } from '../common/enums/user-status.enum';
 import * as bcrypt from 'bcryptjs';
 import dataSource from '../../db/data-source';
-import { Role } from 'src/entities/roles.entity';
-import { Permission } from 'src/entities/permissions.entity';
+import { Role } from '../entities/roles.entity';
+import { Permission } from '../entities/permissions.entity';
 import { Permissions } from '../common/enums/permissions.enum';
 
 async function runSeed() {

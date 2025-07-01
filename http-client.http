@@ -3,16 +3,30 @@
 GET http://localhost:3000/auth/env
 
 
+### Update User Profile
+
+PUT http://localhost:3000/auth/update/4
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYmx1ZWxpbmRhNjE4QGNvZGVtYWlsMS5jb20iLCJpYXQiOjE3NTEzNTc1MDEsImV4cCI6MTc1MTM2MTEwMX0.f0iIbwRli6_kgKLdDxIfrNydd_MJvwaWBwOJLt68tl4
+
+{
+    "firstName": "Kirilov",
+    "lastName": "Dimovska",
+    "email": "kirildimov@plusfieldzone.com",
+    "role": "WORKER"
+}
+
+
 ### Signup User
 
 POST http://localhost:3000/auth/register
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjYsImVtYWlsIjoibmF1bW92YWthdHJpbmthQGJlbW9uZS5jb20iLCJyb2xlIjoiSFIiLCJpYXQiOjE3NTEwMTIzMjcsImV4cCI6MTc1MTAxNTkyN30.YTBcC4Pfg615YDXAGsXazgnFJa-btFbOTp-juyQFzPs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYmx1ZWxpbmRhNjE4QGNvZGVtYWlsMS5jb20iLCJpYXQiOjE3NTEzNTc1MDEsImV4cCI6MTc1MTM2MTEwMX0.f0iIbwRli6_kgKLdDxIfrNydd_MJvwaWBwOJLt68tl4
 
 {
-    "firstName": "Khadijah",
-    "lastName": "Smith",
-    "email": "kadijahsmith28@casinolotte.com",
+    "firstName": "Kiril",
+    "lastName": "Dimov",
+    "email": "kirildimov@plusfieldzone.com",
     "role": "WORKER"
 }
 
@@ -22,10 +36,11 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "naumovakatrinka@bemone.com",
+    "email": "bluelinda618@codemail1.com",
     "password": "mypassword123"
 }
 
+ #"email": "admin@staffhub.com",
  # "password": "mypassword123"
  # "password": "StrngPwd_123"
 
@@ -57,6 +72,6 @@ POST http://localhost:3000/auth/activate
 Content-Type: application/json
 
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImthZGlqYWhzbWl0aDI4QGNhc2lub2xvdHRlLmNvbSIsInR5cGUiOiJhY3RpdmF0aW9uIiwiaWF0IjoxNzUxMDEyMzgxLCJleHAiOjE3NTEwMTU5ODF9.kMnm7p_PxShsbXal_X3r8qOhcxxaduMM9HyIuoLSpD8",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtpcmlsZGltb3ZAcGx1c2ZpZWxkem9uZS5jb20iLCJ0eXBlIjoiYWN0aXZhdGlvbiIsImlhdCI6MTc1MTM1NzUxOCwiZXhwIjoxNzUxMzYxMTE4fQ.x27smIBglmg9t0YCUMncML6M2NdrM3mAZ-N13OXdXTw",
   "password": "mypassword123"
 }

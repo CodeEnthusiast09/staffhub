@@ -8,11 +8,10 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Roles } from '../../common/enums/role.enum';
-import { Role } from 'src/entities/roles.entity';
+import { Role } from '../../entities/roles.entity';
 import { UserStatus } from '../../common/enums/user-status.enum';
 import { Exclude } from 'class-transformer';
-import { Permissions } from 'src/common/enums/permissions.enum';
+import { Permissions } from '../../common/enums/permissions.enum';
 
 @Entity('users')
 export class User {

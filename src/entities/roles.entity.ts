@@ -7,9 +7,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { Permission } from './permissions.entity';
-import { Roles } from 'src/common/enums/role.enum';
+import { Roles } from '../common/enums/role.enum';
 
 @Entity('roles')
 export class Role {
@@ -22,9 +22,7 @@ export class Role {
   @ManyToMany(() => User, (user) => user.roles)
   users: User[];
 
-  @ManyToMany(() => Permission, (permission) => permission.roles, {
-    cascade: true,
-  })
+  @ManyToMany(() => Permission, (permission) => permission.roles)
   @JoinTable({
     name: 'role_permissions',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
