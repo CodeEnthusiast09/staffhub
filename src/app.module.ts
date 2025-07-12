@@ -16,6 +16,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { APP_GUARD } from '@nestjs/core';
+import { ApiKeyGuard } from './common/guards/api-key.guard';
 
 @Module({
   imports: [
@@ -31,7 +33,13 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     AuthModule,
   ],
   controllers: [AppController, EmailController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ApiKeyGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

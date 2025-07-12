@@ -48,6 +48,7 @@ Content-Type: application/json
 
 POST http://localhost:3000/email/send-email
 Content-Type: application/json
+x-api-key: staffhub-b676f73f89189a638e69beb0d5bf6efd
 
 {
   "recipients": ["taiwooa.19@student.funaab.edu.ng"],

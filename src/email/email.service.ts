@@ -10,7 +10,7 @@ export class EmailService {
     const transporter = nodemailer.createTransport({
       host: this.configService.get<string>('EMAIL_HOST'),
       port: this.configService.get<number>('EMAIL_PORT'),
-      secure: true,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: this.configService.get<string>('EMAIL_USER'),
         pass: this.configService.get<string>('EMAIL_PASS'),
@@ -37,6 +37,7 @@ export class EmailService {
       await transporter.sendMail(mailOptions);
       return { message: 'Email sent successfully' };
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       throw new Error(`Failed to send email: ${error?.message ?? error}`);
     }
   }

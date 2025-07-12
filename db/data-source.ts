@@ -35,11 +35,11 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DATABASE_USENAME,
   database: process.env.DATABASE_NAME,
   password: process.env.DATABASE_PWD,
-  // entities: ['dist/**/*.entity.js'],
-  entities: ['src/**/*.entity.ts'],
+  entities: ['dist/**/*.entity.js'],
+  // entities: ['src/**/*.entity.ts'],
   synchronize: false,
-  // migrations: ['dist/db/migrations/*.js'],
-  migrations: ['src/db/migrations/*.js'],
+  migrations: ['dist/db/migrations/*.js'],
+  // migrations: ['src/db/migrations/*.js'],
 };
 
 const dataSource = new DataSource(dataSourceOptions);
